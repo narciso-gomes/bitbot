@@ -1,6 +1,8 @@
+require("dotenv").config();
+
 module.exports = {
-    'username' : 'BitBot',
-    'port' : 6969,
-    'discordEndpoint' : '',
-    'slackEndpoint' : ''
+    'username' : 'G&TController - BitBucket',
+    'port' : process.env.PORT,
+    'discordEndpoint' : process.env.DISCORD_WEBHOOK,
+    'avatar': process.env.IMAGE
 };
