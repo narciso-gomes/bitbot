@@ -55,6 +55,10 @@ app.post("/", function (req, res) {
   post(message);
 });
 
+app.get("/", function(req, resp)  {
+  resp.json({message: config})
+});
+
 app.listen(config.port, function () {
   console.log(config.name + " running on port " + config.port + ".");
   if (config.discordEndpoint) {
