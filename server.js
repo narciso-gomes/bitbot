@@ -9,16 +9,14 @@ var config = require("./config");
 
 const discordPost = (message) => {
   let newMessage = {
-    username: config.username,
-    content: "New push to " + message.repo + " by " + message.username + ".",
-    embeds: [
-      {
-        title: "Hello!",
-        description: "Hi! :grinning:",
-        url: "https://google.com",
-      },
-    ],
-  };
+    "username": config.username,
+    "content": 'New push to ' + message.repo + ' by ' + message.username + '.',
+    "embeds": [{
+        title: message.hash,
+        description: message.commit,
+        url: message.link
+    }]
+}
 
   request(
     {
@@ -44,7 +42,7 @@ app.post("/", function (req, res) {
   console.log("Bitbucket webhook recieved!");
   res.json({ message: "Message recieved by Bitbot." });
   let message = {
-    username: req.body.actor.username,
+    username: req.body.actor.display_name,
     display_name: req.body.actor.display_name,
     repo: req.body.repository.name,
     hash: req.body.push.changes[0].commits[0].hash,
