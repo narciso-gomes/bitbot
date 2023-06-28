@@ -55,8 +55,8 @@ app.post("/", function (req, res) {
   res.json({ message: "Thank you!" });
   const body = req.body;
   let message = {
-    avatar: body.actor.links.avatar.href,
-    display_name: body.actor.display_name,
+    avatar: body.commit_status.commit.author.user.links.avatar.href,
+    display_name: body.commit_status.commit.author.user.display_name,
     repository: body.repository.name,
     link: body.commit_status.url,
     action_name: body.commit_status.name,
