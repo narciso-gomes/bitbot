@@ -1,22 +1,42 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var app = express();
-app.use(bodyParser.json());
-
 var request = require("request");
-
 var config = require("./config");
+
+app.use(bodyParser.json());
 
 const discordPost = (message) => {
   let newMessage = {
-    "username": config.username,
-    "content": 'New push to ' + message.repo + ' by ' + message.username + '.',
-    "embeds": [{
-        title: message.hash,
-        description: message.commit,
-        url: message.link
-    }]
-}
+    username: config.username,
+    avatar_url: config.avatar,
+    embeds: [
+      {
+        author: {
+          name: message.display_name,
+          icon_url: message.avatar,
+        },
+        title: message.action_name,
+        url: message.link,
+        description: message.description,
+        color: 15258703,
+        fields: [
+          {
+            name: "Status",
+            value: message.state,
+          },
+          {
+            name: "Environment",
+            value: message.environment,
+          },
+          {
+            name: "Repository",
+            value: message.repository,
+          },
+        ],
+      },
+    ],
+  };
 
   request(
     {
@@ -26,38 +46,27 @@ const discordPost = (message) => {
       body: newMessage,
     },
     function (error, response, body) {
-      console.log(body);
+    
     }
   );
 };
 
-const post = (message) => {
-  console.log("Posting message...");
-  if (config.discordEndpoint) {
-    discordPost(message);
-  }
-};
-
 app.post("/", function (req, res) {
-  console.log("Bitbucket webhook recieved!");
-  res.json({ message: "Message recieved by Bitbot." });
+  res.json({ message: "Thank you!" });
+  const body = req.body;
   let message = {
-    username: req.body.actor.display_name,
-    display_name: req.body.actor.display_name,
-    repo: req.body.repository.name,
-    hash: req.body.push.changes[0].commits[0].hash,
-    commit: req.body.push.changes[0].commits[0].message,
-    link: req.body.push.changes[0].links.html.href,
+    avatar: body.actor.links.avatar.href,
+    display_name: body.actor.display_name,
+    repository: body.repository.name,
+    link: body.commit_status.url,
+    action_name: body.commit_status.name,
+    state: body.commit_status.state,
+    description: body.commit_status.commit.message,
+    environment: body.commit_status.refname,
   };
-  console.log(message);
-  post(message);
+  discordPost(message);
 });
 
 app.listen(config.port, function () {
   console.log(config.name + " running on port " + config.port + ".");
-  if (config.discordEndpoint) {
-    console.log("Running in Discord mode.");
-  } else {
-    console.log("Endpoints not configured.");
-  }
 });
